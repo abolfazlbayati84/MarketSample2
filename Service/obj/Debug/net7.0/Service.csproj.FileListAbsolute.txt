@@ -1,0 +1,15 @@
+D:\Rider\MarketSample2\Service\bin\Debug\net7.0\Service.deps.json
+D:\Rider\MarketSample2\Service\bin\Debug\net7.0\Service.dll
+D:\Rider\MarketSample2\Service\bin\Debug\net7.0\Service.pdb
+D:\Rider\MarketSample2\Service\bin\Debug\net7.0\Model.dll
+D:\Rider\MarketSample2\Service\bin\Debug\net7.0\Model.pdb
+D:\Rider\MarketSample2\Service\obj\Debug\net7.0\Service.csproj.AssemblyReference.cache
+D:\Rider\MarketSample2\Service\obj\Debug\net7.0\Service.GeneratedMSBuildEditorConfig.editorconfig
+D:\Rider\MarketSample2\Service\obj\Debug\net7.0\Service.AssemblyInfoInputs.cache
+D:\Rider\MarketSample2\Service\obj\Debug\net7.0\Service.AssemblyInfo.cs
+D:\Rider\MarketSample2\Service\obj\Debug\net7.0\Service.csproj.CoreCompileInputs.cache
+D:\Rider\MarketSample2\Service\obj\Debug\net7.0\Service.csproj.CopyComplete
+D:\Rider\MarketSample2\Service\obj\Debug\net7.0\Service.dll
+D:\Rider\MarketSample2\Service\obj\Debug\net7.0\refint\Service.dll
+D:\Rider\MarketSample2\Service\obj\Debug\net7.0\Service.pdb
+D:\Rider\MarketSample2\Service\obj\Debug\net7.0\ref\Service.dll

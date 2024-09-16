@@ -1,0 +1,5 @@
+D:\Rider\MarketSample2\obj\Debug\net7.0\MarketSample2.csproj.AssemblyReference.cache
+D:\Rider\MarketSample2\obj\Debug\net7.0\MarketSample2.GeneratedMSBuildEditorConfig.editorconfig
+D:\Rider\MarketSample2\obj\Debug\net7.0\MarketSample2.AssemblyInfoInputs.cache
+D:\Rider\MarketSample2\obj\Debug\net7.0\MarketSample2.AssemblyInfo.cs
+D:\Rider\MarketSample2\obj\Debug\net7.0\MarketSample2.csproj.CoreCompileInputs.cache
