@@ -5,6 +5,6 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        View.ViewInstance.InitialMethod();
+        //View.ViewInstance.InitialMethod();
     }
 }

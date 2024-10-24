@@ -1,143 +1,143 @@
 ﻿using Model;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
-namespace Service;
-
-public class UserService : IItemService
+namespace Service
 {
-    private static UserService userServiceSample;
-    private User currentUser;
-
-    private UserService()
+    public class UserService : IItemService, IUserService
     {
-        
-    }
+        private static UserService userServiceSample;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public static UserService UserServiceSample
-    {
-        get
+        public UserService(IHttpContextAccessor httpContextAccessor)
         {
-            if (userServiceSample == null)
+            _httpContextAccessor = httpContextAccessor;
+
+            if (!Database.DatabaseSample.Users.Contains(Admin.AdminInstance))
             {
-                userServiceSample = new UserService();
-            }
-
-            return userServiceSample;
-        }
-    }
-
-    public string SignUp(string name,string passwordStr)
-    {
-        if (!Database.DatabaseSample.Users.Contains(Admin.AdminInstance))
-        {
-            Database.DatabaseSample.Users.Add(Admin.AdminInstance);
-        }
-        int password = int.Parse(passwordStr);
-        int id = Database.DatabaseSample.Users.Count;
-        SimpleUser newUser = new SimpleUser(name, id,password);
-        Database.DatabaseSample.Users.Add(newUser);
-        return "You're signed up successfully.";
-    }
-
-    public string Login(string name, string passwordString)
-    {
-        if (!Database.DatabaseSample.Users.Contains(Admin.AdminInstance))
-        {
-            Database.DatabaseSample.Users.Add(Admin.AdminInstance);
-        }
-        int password = int.Parse(passwordString);
-        foreach (var user in Database.DatabaseSample.Users)
-        {
-            if (user.Name.Equals(name) && user.Password.Equals(password))
-            {
-                currentUser = user;
-                return "You are successfully logged in.";
+                Database.DatabaseSample.Users.Add(Admin.AdminInstance);
             }
         }
 
-        return "Couldn't find you.";
-    }
+        // Property to access the current session
+        private ISession Session => _httpContextAccessor.HttpContext?.Session;
 
-    public string ChangeInformation(string newName, string newPasswordStr)
-    {
-        currentUser.Name = newName;
-        int newPassword = int.Parse(newPasswordStr);
-        currentUser.Password = newPassword;
-        return "Your information changed successfully.";
-    }
-
-    public string AddItem(string itemType, string name, string price,string specificNumber)
-    {
-        if (currentUser is Admin)
+        public Boolean SignUp(string name, string passwordStr)
         {
-            if (itemType.Equals("C"))
+            if (!Database.DatabaseSample.Users.Contains(Admin.AdminInstance))
             {
-                int id = Database.DatabaseSample.Items.Count;
-                Car newCar = new Car(name, int.Parse(price),int.Parse(specificNumber),id);
-                Database.DatabaseSample.Items.Add(newCar);
-                return "Item is added successfully.";
-            }else if (itemType.Equals("B"))
-            {
-                int id = Database.DatabaseSample.Items.Count;
-                Bicycle newBike = new Bicycle(name, int.Parse(price), int.Parse(specificNumber),id);
-                Database.DatabaseSample.Items.Add(newBike);
-                return "Item is added successfully.";
+                Database.DatabaseSample.Users.Add(Admin.AdminInstance);
             }
+            int password = int.Parse(passwordStr);
+            int id = Database.DatabaseSample.Users.Count;
+            SimpleUser newUser = new SimpleUser(name, id, password);
+            Database.DatabaseSample.Users.Add(newUser);
+            return true;
         }
 
-        return "Only admin can add item.";
-    }
-
-    public string RemoveItem(string name ,string id)
-    {
-        int itemId = int.Parse(id);
-        if (currentUser is Admin)
+        public IActionResult Login(string name, string passwordString)
         {
-            foreach (var item in Database.DatabaseSample.Items)
+            int password = int.Parse(passwordString);
+            var user = Database.DatabaseSample.Users.FirstOrDefault(u => u.Name.Equals(name) && u.Password.Equals(password));
+
+            if (user != null)
             {
-                if (item.Name.Equals(name) && item.Id.Equals(itemId))
+                // Use session to store the current user's information
+                Session?.SetString("CurrentUser", name);
+                return new OkObjectResult("Login successful.");
+            }
+
+            return new UnauthorizedResult();
+        }
+
+        public Boolean ChangeInformation(string newName, string newPasswordStr)
+        {
+            string currentUserName = Session?.GetString("CurrentUser");
+            var currentUser = Database.DatabaseSample.Users.FirstOrDefault(u => u.Name.Equals(currentUserName));
+
+            if (currentUser != null)
+            {
+                currentUser.Name = newName;
+                currentUser.Password = int.Parse(newPasswordStr);
+                return true;
+            }
+
+            return false;
+        }
+
+        public Boolean AddItem(string itemType, string name, string price, string specificNumber)
+        {
+            string currentUserName = Session?.GetString("CurrentUser");
+            var currentUser = Database.DatabaseSample.Users.FirstOrDefault(u => u.Name.Equals(currentUserName));
+
+            if (currentUser is Admin)
+            {
+                if (itemType.Equals("C"))
+                {
+                    int id = Database.DatabaseSample.Items.Count;
+                    Car newCar = new Car(name, int.Parse(price), int.Parse(specificNumber), id);
+                    Database.DatabaseSample.Items.Add(newCar);
+                    return true;
+                }
+                else if (itemType.Equals("B"))
+                {
+                    int id = Database.DatabaseSample.Items.Count;
+                    Bicycle newBike = new Bicycle(name, int.Parse(price), int.Parse(specificNumber), id);
+                    Database.DatabaseSample.Items.Add(newBike);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public Boolean RemoveItem(string name, string id)
+        {
+            string currentUserName = Session?.GetString("CurrentUser");
+            var currentUser = Database.DatabaseSample.Users.FirstOrDefault(u => u.Name.Equals(currentUserName));
+
+            if (currentUser is Admin)
+            {
+                int itemId = int.Parse(id);
+                var item = Database.DatabaseSample.Items.FirstOrDefault(i => i.Name.Equals(name) && i.Id == itemId);
+
+                if (item != null)
                 {
                     Database.DatabaseSample.Items.Remove(item);
-                    return "Item is removed successfully";
+                    return true;
                 }
             }
-            return "Couldn't find the item.";
+
+            return false;
         }
 
-        return "Only admin can remove item.";
-    }
-
-    public string BuyItem(string name,string id)
-    {
-        int itemId = int.Parse(id);
-        if (currentUser is SimpleUser)
+        public Boolean BuyItem(string name, string id)
         {
-            Item selectedItem = null;
-            foreach (var item in Database.DatabaseSample.Items)
+            string currentUserName = Session?.GetString("CurrentUser");
+            var currentUser = Database.DatabaseSample.Users.FirstOrDefault(u => u.Name.Equals(currentUserName)) as SimpleUser;
+
+            if (currentUser != null)
             {
-                if (item.Name.Equals(name) && item.Id.Equals(itemId))
+                int itemId = int.Parse(id);
+                var selectedItem = Database.DatabaseSample.Items.FirstOrDefault(i => i.Name.Equals(name) && i.Id == itemId);
+
+                if (selectedItem != null && currentUser.Money >= selectedItem.Price)
                 {
-                    selectedItem = item;
-                    break;
+                    currentUser.Money -= selectedItem.Price;
+                    currentUser.Items.Add(selectedItem);
+                    Database.DatabaseSample.Items.Remove(selectedItem);
+                    return true;
                 }
             }
-            if (selectedItem != null)
-            {
-                SimpleUser simpleUser = (SimpleUser)currentUser;
-                if (simpleUser.Money >= selectedItem.Price)
-                {
-                    simpleUser.Money = simpleUser.Money - selectedItem.Price;
-                    simpleUser.Items.Add(selectedItem);
-                    Database.DatabaseSample.Items.Remove(selectedItem);
-                    return "Purchase was successful.";
-                }
-            } 
-        }
-        return "Purchase was not successful.";
-    }
 
-    public string Logout()
-    {
-        currentUser = null;
-        return "You are logged out successfully.";
+            return false;
+        }
+
+        public Boolean Logout()
+        {
+            // Clear session to log out
+            _httpContextAccessor.HttpContext.Session.Clear();
+            return true;
+        }
     }
 }
