@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Service;
 using Model;
+using Model.DTOs;
+
 namespace WebApplication1.Controllers;
 
 [ApiController]
@@ -17,9 +19,9 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("SignUp")]
-    public ActionResult SignUp(string name, string password)
+    public ActionResult SignUp(SignupRequest request)
     {
-        var isSignedUp = _userService.SignUp(name, password);
+        var isSignedUp = _userService.SignUp(request.name, request.password);
 
         if (isSignedUp)
         {
@@ -30,17 +32,17 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("Login")]
-    public IActionResult Login(string name, string password)
+    public IActionResult Login(LoginRequest request)
     {
-        var isLoggedin = _userService.Login(name, password);
+        var isLoggedin = _userService.Login(request.name, request.password);
 
         return isLoggedin;
     }
 
     [HttpPut("ChangeInformation")]
-    public ActionResult ChangeInformation(string newName, string newPassword)
+    public ActionResult ChangeInformation(ChangeInformationRequest request)
     {
-        var isChanged = _userService.ChangeInformation(newName, newPassword);
+        var isChanged = _userService.ChangeInformation(request.name, request.password);
         
         if (isChanged)
         {
@@ -63,10 +65,23 @@ public class UserController : ControllerBase
         return BadRequest();
     }
 
-    [HttpPost("AddItem")]
-    public ActionResult AddItem(string itemType, string name, string price, string specificNumber)
+    [HttpPost("AddCar")]
+    public ActionResult AddCar(Car car)
     {
-        var isAdded = _itemService.AddItem(itemType, name, price, specificNumber);
+        var isAdded = _itemService.AddCar(car);
+
+        if (isAdded)
+        {
+            return Ok();
+        }
+
+        return BadRequest();
+    }
+
+    [HttpPost("AddBicycle")]
+    public ActionResult AddBicycle(Bicycle bicycle)
+    {
+        var isAdded = _itemService.AddBicycle(bicycle);
 
         if (isAdded)
         {
@@ -77,9 +92,9 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("BuyItem")]
-    public ActionResult BuyItem(string name, string id)
+    public ActionResult BuyItem(BuyRequest request)
     {
-        var isBought = _itemService.BuyItem(name, id);
+        var isBought = _itemService.BuyItem(request.name, request.id);
 
         if (isBought)
         {
@@ -89,10 +104,31 @@ public class UserController : ControllerBase
         return BadRequest();
     }
 
-    [HttpDelete("RemoveItem")]
-    public ActionResult RemoveItem(string name, string id)
+    [HttpGet("UsersInfo")]
+    public ActionResult UsersInfo()
     {
-        var isRemoved = _itemService.RemoveItem(name, id);
+        try
+        {
+            UsersInfoResponse response = _userService.UsersInfo();
+            return Ok(response);
+        }
+        catch (Exception e)
+        {
+            return BadRequest();
+        }
+    }
+
+    [HttpGet("ItemsInfo")]
+    public ActionResult ItemsInfo()
+    {
+        ItemsInfoRespose response = _itemService.ItemsInfo();
+        return Ok(response);
+    }
+
+    [HttpDelete("RemoveItem")]
+    public ActionResult RemoveItem(RemoveItemRequest request)
+    {
+        var isRemoved = _itemService.RemoveItem(request.name,request.id);
         if (isRemoved)
         {
             return NoContent();

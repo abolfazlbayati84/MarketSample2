@@ -1,6 +1,7 @@
 ﻿using Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Model.DTOs;
 
 namespace Service
 {
@@ -18,8 +19,6 @@ namespace Service
                 Database.DatabaseSample.Users.Add(Admin.AdminInstance);
             }
         }
-
-        // Property to access the current session
         private ISession Session => _httpContextAccessor.HttpContext?.Session;
 
         public Boolean SignUp(string name, string passwordStr)
@@ -42,7 +41,6 @@ namespace Service
 
             if (user != null)
             {
-                // Use session to store the current user's information
                 Session?.SetString("CurrentUser", name);
                 return new OkObjectResult("Login successful.");
             }
@@ -65,27 +63,31 @@ namespace Service
             return false;
         }
 
-        public Boolean AddItem(string itemType, string name, string price, string specificNumber)
+        public Boolean AddCar(Car car)
         {
             string currentUserName = Session?.GetString("CurrentUser");
             var currentUser = Database.DatabaseSample.Users.FirstOrDefault(u => u.Name.Equals(currentUserName));
 
             if (currentUser is Admin)
             {
-                if (itemType.Equals("C"))
-                {
-                    int id = Database.DatabaseSample.Items.Count;
-                    Car newCar = new Car(name, int.Parse(price), int.Parse(specificNumber), id);
-                    Database.DatabaseSample.Items.Add(newCar);
-                    return true;
-                }
-                else if (itemType.Equals("B"))
-                {
-                    int id = Database.DatabaseSample.Items.Count;
-                    Bicycle newBike = new Bicycle(name, int.Parse(price), int.Parse(specificNumber), id);
-                    Database.DatabaseSample.Items.Add(newBike);
-                    return true;
-                }
+                car.Id = Database.DatabaseSample.Items.Count;
+                Database.DatabaseSample.Items.Add(car);
+                return true;
+            }
+
+            return false;
+        }
+
+        public Boolean AddBicycle(Bicycle bicycle)
+        {
+            string currentUserName = Session?.GetString("CurrentUser");
+            var currentUser = Database.DatabaseSample.Users.FirstOrDefault(u => u.Name.Equals(currentUserName));
+
+            if (currentUser is Admin)
+            {
+                bicycle.Id = Database.DatabaseSample.Items.Count;
+                Database.DatabaseSample.Items.Add(bicycle);
+                return true;
             }
 
             return false;
@@ -133,9 +135,40 @@ namespace Service
             return false;
         }
 
-        public Boolean Logout()
+        public UsersInfoResponse UsersInfo()
         {
-            // Clear session to log out
+            string currentUserName = Session?.GetString("CurrentUser");
+            var currentUser = Database.DatabaseSample.Users.FirstOrDefault(u => u.Name.Equals(currentUserName));
+
+            if (currentUser is Admin)
+            {
+                UsersInfoResponse response = new UsersInfoResponse();
+                foreach(User user in Database.DatabaseSample.Users)
+                {
+                    string str = "Name : " + user.Name + "      ID: " + user.Id;
+                    response.users.Add(str);
+                }
+
+                return response;
+            }
+
+            throw new Exception();
+        }
+
+        public ItemsInfoRespose ItemsInfo()
+        {
+            ItemsInfoRespose response = new ItemsInfoRespose();
+            foreach (Item item in Database.DatabaseSample.Items)
+            {
+                string str = "Name: " + item.Name + "      ID: " + item.Id;
+                response.items.Add(str);
+            }
+
+            return response;
+        }
+
+        public Boolean Logout()
+        { 
             _httpContextAccessor.HttpContext.Session.Clear();
             return true;
         }

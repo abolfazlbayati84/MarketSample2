@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "PNHegbIoqwQqQ8YYQRmh2kpg6qA52/zEZoL4bsGYphGNHPVb3iFOyi7THGHk5F2Ss6ZwVjzuMex4MNuOpnIHFg==",
+  "dgSpecHash": "rmzgLjbDXzXIzhszq3fDVaqSP5xwDz7po2MKCTCD6nZeX4YI0qiOW8taTCL+F8t8BUzgxe3y88pFcvHTRxoDjQ==",
   "success": true,
   "projectFilePath": "D:\\Rider\\MarketSample2\\ServiceTest\\ServiceTest.csproj",
   "expectedPackageFiles": [
@@ -127,5 +127,12 @@
     "C:\\Users\\Salam\\.nuget\\packages\\xunit.extensibility.execution\\2.4.2\\xunit.extensibility.execution.2.4.2.nupkg.sha512",
     "C:\\Users\\Salam\\.nuget\\packages\\xunit.runner.visualstudio\\2.4.5\\xunit.runner.visualstudio.2.4.5.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1900",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Error occurred while getting package vulnerability data: The SSL connection could not be established, see inner exception."
+    }
+  ]
 }

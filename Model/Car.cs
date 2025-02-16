@@ -9,7 +9,7 @@ public class Car : Item
         set { speed = value; }
     }
 
-    public Car(string name, int price, int speed,int id):base(name,price,id)
+    public Car(string name, int price, int speed):base(name,price)
     {
         this.speed = speed;
     }

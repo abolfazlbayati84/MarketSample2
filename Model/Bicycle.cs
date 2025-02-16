@@ -9,7 +9,7 @@ public class Bicycle : Item
         set { gearNumber = value; }
     }
 
-    public Bicycle(string name, int price, int gearNumber,int id):base(name,price,id)
+    public Bicycle(string name, int price, int gearNumber):base(name,price)
     {
         this.gearNumber = gearNumber;
     }
